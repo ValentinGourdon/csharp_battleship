@@ -8,7 +8,6 @@ namespace battleship
     {
         static void Main(string[] args)
         {
-            //autoMatch();
             bool continueGame = true;
             while(continueGame) {
                 Console.Clear();
@@ -110,7 +109,11 @@ namespace battleship
                             p1 = new Player(name1, gridA_P1, gridD_P1, boatsPosP1, boatsDefP1);
                             name2 = getRandomName();
                             bp2 = new BotPlayer(name2, gridA_P2, gridD_P2, boatsPosP2, boatsDefP2, 1);
-                            Console.WriteLine(name1 + ", you play against " + name2);
+                            Console.Clear();
+                            Console.WriteLine(name1 + ", you will play against " + name2);
+                            Console.WriteLine("Press any touch to start.");
+                            Console.ReadKey();
+                            Console.Clear();
                             PvsBMatch(p1, bp2);
                             choiceMode = true;
                             break;
@@ -143,6 +146,7 @@ namespace battleship
                     }                        
                 } while(!inputCorrect);
             }
+            Console.Clear();
             Console.WriteLine("Thank you for playing. Bye !");
         }
 
@@ -218,13 +222,13 @@ namespace battleship
             int count = 0;
             while(p1.isAlive() && p2.isAlive()) {
                 count++;
-                p1.autoShoot(p2);
+                p1.autoShoot(p2, true);
                 /*Console.WriteLine("Press any touch to continue.");
                 Console.ReadKey();
                 Console.Clear();*/
                 if(!p2.isAlive())
                         break;
-                p2.autoShoot(p1);
+                p2.autoShoot(p1, true);
                 /*Console.WriteLine("Press any touch to continue.");
                 Console.ReadKey();
                 Console.Clear();*/
@@ -243,6 +247,9 @@ namespace battleship
                                     + " with " + count + " shoots !");
                 
             }
+            Console.WriteLine("Press any touch to continue.");
+            Console.ReadKey();
+            Console.Clear();
 
             Console.WriteLine("Final grids :");
             p1.displayBothGrid();
@@ -276,7 +283,7 @@ namespace battleship
                 
                 shootCorrect = false;
                 while(!shootCorrect) {
-                    p2.autoShoot(p1);
+                    p2.autoShoot(p1, false);
                     Console.WriteLine("Press any touch to continue.");
                     Console.ReadKey();
                     Console.Clear();
@@ -293,7 +300,11 @@ namespace battleship
                                     + " ! You've lost against " + p1.getName() 
                                     + " in " + count + " shoots !");
             }
-                            
+
+            Console.WriteLine("Press any touch to continue.");
+            Console.ReadKey();
+            Console.Clear();
+
             Console.WriteLine("Final grids :");
             p1.displayBothGrid();
             Console.WriteLine("\n");

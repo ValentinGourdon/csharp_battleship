@@ -30,9 +30,10 @@ public class BotPlayer : Player{
         }
     }
 
-    public void autoShoot(Player opp) {
+    public void autoShoot(Player opp, bool displayMode) {
         Console.Clear();
-        this.displayBothGrid();
+        if(displayMode)
+            this.displayBothGrid();
         int x = 99, y = 99;
         bool shootOk = false;
 
@@ -47,7 +48,10 @@ public class BotPlayer : Player{
 
         Console.WriteLine("Player " + this.name + " shoot at " + opp.getName());
         Console.WriteLine("Targeting " + new Grid().XYToString(x, y) + "...");
-        System.Threading.Thread.Sleep(500);
+        if(displayMode)
+            System.Threading.Thread.Sleep(500);
+        else
+            System.Threading.Thread.Sleep(1000);
         if(opp.getDefense().getGrid()[x, y] == 0) {
             opp.getDefense().setGrid(x, y, 6);
             Console.WriteLine("Missed...");

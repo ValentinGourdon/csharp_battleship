@@ -321,7 +321,7 @@ public class Grid {
                 ret += "J";
                 break;
         }
-        ret += x;
+        ret += (x + 1);
         return ret;
     }
 
