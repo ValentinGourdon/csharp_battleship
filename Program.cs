@@ -222,13 +222,13 @@ namespace battleship
             int count = 0;
             while(p1.isAlive() && p2.isAlive()) {
                 count++;
-                p1.autoShoot(p2, true);
+                p1.autoShoot(p2, true, 1);
                 /*Console.WriteLine("Press any touch to continue.");
                 Console.ReadKey();
                 Console.Clear();*/
                 if(!p2.isAlive())
                         break;
-                p2.autoShoot(p1, true);
+                p2.autoShoot(p1, true, 1);
                 /*Console.WriteLine("Press any touch to continue.");
                 Console.ReadKey();
                 Console.Clear();*/
@@ -283,7 +283,7 @@ namespace battleship
                 
                 shootCorrect = false;
                 while(!shootCorrect) {
-                    p2.autoShoot(p1, false);
+                    p2.autoShoot(p1, false, 1);
                     Console.WriteLine("Press any touch to continue.");
                     Console.ReadKey();
                     Console.Clear();

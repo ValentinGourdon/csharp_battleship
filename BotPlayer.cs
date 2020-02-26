@@ -30,7 +30,17 @@ public class BotPlayer : Player{
         }
     }
 
-    public void autoShoot(Player opp, bool displayMode) {
+    public void autoShoot(Player opp, bool displayMode, int level) {
+        switch(level) {
+            case 1 :
+                autoShootSimple(opp, displayMode);
+                break;
+            case 2 :
+                break;
+        }
+    }
+
+    public void autoShootSimple(Player opp, bool displayMode) {
         Console.Clear();
         if(displayMode)
             this.displayBothGrid();
