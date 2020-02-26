@@ -99,19 +99,27 @@ namespace battleship
                             name2 = Console.ReadLine();
                             p1 = new Player(name1, gridA_P1, gridD_P1, boatsPosP1, boatsDefP1);
                             p2 = new Player(name2, gridA_P2, gridD_P2, boatsPosP2, boatsDefP2);
-                            pvpMatch(p1, p2);
+                            PvsPMatch(p1, p2);
                             choiceMode = true;
                             break;
                         
                         case "2":
-                            Console.WriteLine("Mode not available for the moment.");
+                            Console.WriteLine("Player 1, enter your name : ");
+                            name1 = Console.ReadLine();
+
+                            p1 = new Player(name1, gridA_P1, gridD_P1, boatsPosP1, boatsDefP1);
+                            name2 = getRandomName();
+                            bp2 = new BotPlayer(name2, gridA_P2, gridD_P2, boatsPosP2, boatsDefP2, 1);
+                            Console.WriteLine(name1 + ", you play against " + name2);
+                            PvsBMatch(p1, bp2);
+                            choiceMode = true;
                             break;
 
 
                         case "3" :
                             bp1 = new BotPlayer(getRandomName(), gridA_P1, gridD_P1, boatsPosP1, boatsDefP1, 1);
                             bp2 = new BotPlayer(getRandomName(), gridA_P2, gridD_P2, boatsPosP2, boatsDefP2, 1);
-                            autoMatch(bp1, bp2);
+                            BvsBMatch(bp1, bp2);
                             choiceMode = true;
                             break;
 
@@ -138,7 +146,7 @@ namespace battleship
             Console.WriteLine("Thank you for playing. Bye !");
         }
 
-        public static void pvpMatch(Player p1, Player p2) {
+        public static void PvsPMatch(Player p1, Player p2) {
             Console.Clear();
 
             p1.placeAllBoats();
@@ -192,7 +200,7 @@ namespace battleship
             p2.displayBothGrid();
         }
         
-        public static void autoMatch(BotPlayer p1, BotPlayer p2) {
+        public static void BvsBMatch(BotPlayer p1, BotPlayer p2) {
             Console.Clear();
 
             p1.autoPlaceAllBoats();
@@ -242,8 +250,54 @@ namespace battleship
             p2.displayBothGrid();
         }
 
-        public static void pvbMatch(Player p1, BotPlayer p2) {
-            
+        public static void PvsBMatch(Player p1, BotPlayer p2) {
+            Console.Clear();
+
+            p1.placeAllBoats();
+            p2.autoPlaceAllBoats();
+
+            int count = 0;
+            while(p1.isAlive() && p2.isAlive()) {
+                bool shootCorrect = false;
+                while(!shootCorrect) {
+                    p1.displayBothGrid();
+                    Console.WriteLine(p1.getName() + ", it's your turn to shoot. Please enter coordinates : (A1 to J10)");
+                    string shootInput = Console.ReadLine();
+                    if(p1.shoot(p2, shootInput)) {
+                        Console.WriteLine("Press any touch to continue.");
+                        Console.ReadKey();
+                        Console.Clear();
+                        shootCorrect = true;
+                    }
+                }
+
+                if(!p2.isAlive())
+                    break;
+                
+                shootCorrect = false;
+                while(!shootCorrect) {
+                    p2.autoShoot(p1);
+                    Console.WriteLine("Press any touch to continue.");
+                    Console.ReadKey();
+                    Console.Clear();
+                    shootCorrect = true;
+                }
+                count ++;
+            }
+            if(p1.isAlive()) {
+                Console.WriteLine("Congratulations " + p1.getName()
+                                    + " you've beaten " + p2.getName() 
+                                    + " with " + count + " shoots !");
+            } else {
+                Console.WriteLine("Oh no " + p2.getName()
+                                    + " ! You've lost against " + p1.getName() 
+                                    + " in " + count + " shoots !");
+            }
+                            
+            Console.WriteLine("Final grids :");
+            p1.displayBothGrid();
+            Console.WriteLine("\n");
+            p2.displayBothGrid();
         }
 
         public static string getRandomName() {
