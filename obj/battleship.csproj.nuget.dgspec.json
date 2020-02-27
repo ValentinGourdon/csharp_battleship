@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "/home/gourdon/Documents/C#/battleship/battleship.csproj": {}
+    "/home/gourdon/Documents/C#/csharp_battleship/battleship.csproj": {}
   },
   "projects": {
-    "/home/gourdon/Documents/C#/battleship/battleship.csproj": {
+    "/home/gourdon/Documents/C#/csharp_battleship/battleship.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/home/gourdon/Documents/C#/battleship/battleship.csproj",
+        "projectUniqueName": "/home/gourdon/Documents/C#/csharp_battleship/battleship.csproj",
         "projectName": "battleship",
-        "projectPath": "/home/gourdon/Documents/C#/battleship/battleship.csproj",
+        "projectPath": "/home/gourdon/Documents/C#/csharp_battleship/battleship.csproj",
         "packagesPath": "/home/gourdon/.nuget/packages/",
-        "outputPath": "/home/gourdon/Documents/C#/battleship/obj/",
+        "outputPath": "/home/gourdon/Documents/C#/csharp_battleship/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/home/gourdon/.nuget/NuGet/NuGet.Config"

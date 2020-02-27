@@ -89,6 +89,7 @@ namespace battleship
                 while(!choiceMode) {
                     Console.WriteLine("\n1 - Player 1 VS Player 2\n2 - Player 1 VS CPU\n3 - CPU 1 VS CPU 2\nChoose your combat mode :");
                     gameMode = Console.ReadLine();
+                    int botLevel = 0;
                     switch(gameMode) {
                         case "1":
                             Console.WriteLine("Player 1, enter your name : ");
@@ -106,11 +107,13 @@ namespace battleship
                             Console.WriteLine("Player 1, enter your name : ");
                             name1 = Console.ReadLine();
 
+                            botLevel = chooseBotLevel();
                             p1 = new Player(name1, gridA_P1, gridD_P1, boatsPosP1, boatsDefP1);
                             name2 = getRandomName();
-                            bp2 = new BotPlayer(name2, gridA_P2, gridD_P2, boatsPosP2, boatsDefP2, 1);
+                            bp2 = new BotPlayer(name2, gridA_P2, gridD_P2, boatsPosP2, boatsDefP2, botLevel);
                             Console.Clear();
-                            Console.WriteLine(name1 + ", you will play against " + name2);
+                            Console.WriteLine(name1 + ", you will play against " 
+                                                + name2 + " (lvl " + botLevel + ")");
                             Console.WriteLine("Press any touch to start.");
                             Console.ReadKey();
                             Console.Clear();
@@ -120,8 +123,16 @@ namespace battleship
 
 
                         case "3" :
-                            bp1 = new BotPlayer(getRandomName(), gridA_P1, gridD_P1, boatsPosP1, boatsDefP1, 1);
-                            bp2 = new BotPlayer(getRandomName(), gridA_P2, gridD_P2, boatsPosP2, boatsDefP2, 1);
+                            botLevel = chooseBotLevel();
+                            name1 = getRandomName();
+                            name2 = getRandomName();
+                            bp1 = new BotPlayer(name1, gridA_P1, gridD_P1, boatsPosP1, boatsDefP1, botLevel);
+                            bp2 = new BotPlayer(name2, gridA_P2, gridD_P2, boatsPosP2, boatsDefP2, botLevel);
+                            Console.WriteLine(name1 + " (lvl " + botLevel + ") will play against " 
+                                                + name2 + " (lvl " + botLevel + ")");
+                            Console.WriteLine("Press any touch to start.");
+                            Console.ReadKey();
+                            Console.Clear();
                             BvsBMatch(bp1, bp2);
                             choiceMode = true;
                             break;
@@ -219,19 +230,50 @@ namespace battleship
             Console.ReadKey();
             Console.Clear();
 
+            bool stepContinue = false;
+            bool stopByStep = true;
+            while(!stepContinue) {
+                Console.WriteLine("Do you want to stop at each step ? (Yes /No)");
+                string stepInput = Console.ReadLine();
+                switch(stepInput) {
+                    case "Yes":
+                    case "yes":
+                    case "Y":
+                    case "y":
+                        stopByStep = true;
+                        stepContinue = true;
+                        break;
+                    case "No":
+                    case "no":
+                    case "N":
+                    case "n":
+                        stopByStep = false;
+                        stepContinue = true;
+                        break;
+                    default:
+                        Console.WriteLine("Wrong inut.");
+                        break;
+                }
+            }
+
+
             int count = 0;
             while(p1.isAlive() && p2.isAlive()) {
                 count++;
-                p1.autoShoot(p2, true, 1);
-                /*Console.WriteLine("Press any touch to continue.");
-                Console.ReadKey();
-                Console.Clear();*/
+                p1.autoShoot(p2, true, p1.getLevel());
+                if(stopByStep) {
+                    Console.WriteLine("Press any touch to continue.");
+                    Console.ReadKey();
+                    Console.Clear();
+                }
                 if(!p2.isAlive())
                         break;
-                p2.autoShoot(p1, true, 1);
-                /*Console.WriteLine("Press any touch to continue.");
-                Console.ReadKey();
-                Console.Clear();*/
+                p2.autoShoot(p1, true, p2.getLevel());
+                if(stopByStep) {
+                    Console.WriteLine("Press any touch to continue.");
+                    Console.ReadKey();
+                    Console.Clear();
+                }
             }
 
             Console.Clear();
@@ -283,7 +325,7 @@ namespace battleship
                 
                 shootCorrect = false;
                 while(!shootCorrect) {
-                    p2.autoShoot(p1, false, 1);
+                    p2.autoShoot(p1, false, p2.getLevel());
                     Console.WriteLine("Press any touch to continue.");
                     Console.ReadKey();
                     Console.Clear();
@@ -309,6 +351,39 @@ namespace battleship
             p1.displayBothGrid();
             Console.WriteLine("\n");
             p2.displayBothGrid();
+        }
+
+        private static int chooseBotLevel() {
+            int level = 0;
+            bool choice = false;
+            while(!choice) {
+                Console.WriteLine("Please choose the CPU level :\n"
+                                + "\t1 - Easy (E)\n\t2 - Medium (M)");
+                string input = Console.ReadLine();
+                switch(input) {
+                    case "1":
+                    case "Easy":
+                    case "easy":
+                    case "E":
+                    case "e":
+                        level = 1;
+                        choice = true;
+                        break;
+                    case "2":
+                    case "Medium":
+                    case "medium":
+                    case "M":
+                    case "m":
+                        level = 2;
+                        choice = true;
+                        break;
+                    default:
+                        Console.WriteLine("Wrong input.");
+                        break;
+                }
+            }
+            Console.Clear();
+            return level;
         }
 
         public static string getRandomName() {

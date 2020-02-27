@@ -9,3 +9,14 @@
 /home/gourdon/Documents/C#/battleship/obj/Debug/netcoreapp3.1/battleship.AssemblyInfo.cs
 /home/gourdon/Documents/C#/battleship/obj/Debug/netcoreapp3.1/battleship.dll
 /home/gourdon/Documents/C#/battleship/obj/Debug/netcoreapp3.1/battleship.pdb
+/home/gourdon/Documents/C#/csharp_battleship/bin/Debug/netcoreapp3.1/battleship
+/home/gourdon/Documents/C#/csharp_battleship/bin/Debug/netcoreapp3.1/battleship.deps.json
+/home/gourdon/Documents/C#/csharp_battleship/bin/Debug/netcoreapp3.1/battleship.runtimeconfig.json
+/home/gourdon/Documents/C#/csharp_battleship/bin/Debug/netcoreapp3.1/battleship.runtimeconfig.dev.json
+/home/gourdon/Documents/C#/csharp_battleship/bin/Debug/netcoreapp3.1/battleship.dll
+/home/gourdon/Documents/C#/csharp_battleship/bin/Debug/netcoreapp3.1/battleship.pdb
+/home/gourdon/Documents/C#/csharp_battleship/obj/Debug/netcoreapp3.1/battleship.csprojAssemblyReference.cache
+/home/gourdon/Documents/C#/csharp_battleship/obj/Debug/netcoreapp3.1/battleship.AssemblyInfoInputs.cache
+/home/gourdon/Documents/C#/csharp_battleship/obj/Debug/netcoreapp3.1/battleship.AssemblyInfo.cs
+/home/gourdon/Documents/C#/csharp_battleship/obj/Debug/netcoreapp3.1/battleship.dll
+/home/gourdon/Documents/C#/csharp_battleship/obj/Debug/netcoreapp3.1/battleship.pdb

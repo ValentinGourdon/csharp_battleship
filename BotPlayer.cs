@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Windows;
 
 public class BotPlayer : Player{
     private int level;
+    private List<Point> successShoots;
 
     public BotPlayer(string name,  Grid attack, Grid defense, List<Boat> boatsPos, List<Boat> boatsDef, int level) {
         this.name = name;
@@ -11,6 +13,7 @@ public class BotPlayer : Player{
         this.boatsPos = boatsPos;
         this.boatsDef = boatsDef;
         this.level = level;
+        this.successShoots = new List<Point>();
     }
 
     public void autoPlaceAllBoats() {
@@ -31,30 +34,20 @@ public class BotPlayer : Player{
     }
 
     public void autoShoot(Player opp, bool displayMode, int level) {
-        switch(level) {
-            case 1 :
-                autoShootSimple(opp, displayMode);
-                break;
-            case 2 :
-                break;
-        }
-    }
-
-    public void autoShootSimple(Player opp, bool displayMode) {
         Console.Clear();
         if(displayMode)
             this.displayBothGrid();
-        int x = 99, y = 99;
-        bool shootOk = false;
+        Point p = null;
 
-        while(!shootOk) {
-            x = new Random().Next(0, 10);
-            y = new Random().Next(0, 10);
-            // To be sure to shoot a non shot case
-            if(opp.getDefense().getGrid()[x, y] != 6 &&
-                opp.getDefense().getGrid()[x, y] != 7)
-                shootOk = true;
+        switch(level) {
+            case 1 :
+                p = chooseShootSimple(opp);
+                break;
+            case 2 :
+                p = chooseShootMedium(opp);
+                break;
         }
+        int x = p.getX(), y = p.getY();
 
         Console.WriteLine("Player " + this.name + " shoot at " + opp.getName());
         Console.WriteLine("Targeting " + new Grid().XYToString(x, y) + "...");
@@ -85,6 +78,7 @@ public class BotPlayer : Player{
                     b = opp.getBoatsDef().Find(x => x.getName().Contains("Destroyer"));
                     break;
             }
+            this.successShoots.Add(new Point(x, y));    // For Medium level
             b.setTouched();
             opp.getDefense().setGrid(x, y, 7);
             Console.WriteLine("Hit !");
@@ -94,8 +88,160 @@ public class BotPlayer : Player{
                 Console.WriteLine("Sunk !!! " + this.getName() 
                                     + " sunk the enemy's " + b.getName());
                 opp.getBoatsDef().Remove(b);
+                this.successShoots.RemoveAt(0);
             }
         }
+    }
+
+    private Point chooseShootSimple(Player opp) {
+        bool shootOk = false;
+        int x = 99, y = 99;
+        while(!shootOk) {
+            x = new Random().Next(0, 10);
+            y = new Random().Next(0, 10);
+            // To be sure to shoot a non shot case
+            if(opp.getDefense().getGrid()[x, y] != 6 &&
+                opp.getDefense().getGrid()[x, y] != 7)
+                shootOk = true;
+        }
+        return new Point(x, y);
+    }
+
+    private Point chooseShootMedium(Player opp) {
+        if(this.successShoots.Count == 0) {
+            return chooseShootSimple(opp);
+        } else {
+            if(isCaseShotAllAround(opp, this.successShoots[0])) {
+                this.successShoots.RemoveAt(0);
+                return chooseShootSimple(opp);
+            } else {
+                Point np = getNextShoot(opp);
+                if(opp.getDefense().getGrid()[np.getX(), np.getY()] == 1 ||
+                    opp.getDefense().getGrid()[np.getX(), np.getY()] == 2 ||
+                    opp.getDefense().getGrid()[np.getX(), np.getY()] == 3 ||
+                    opp.getDefense().getGrid()[np.getX(), np.getY()] == 4 ||
+                    opp.getDefense().getGrid()[np.getX(), np.getY()] == 5)
+                    this.successShoots.Add(np);
+                return np;
+            }
+        }
+    }
+
+    private Point getNextShoot(Player opp) {
+        Point p = this.successShoots[0];
+        int[,] g = opp.getDefense().getGrid();
+        int x = p.getX(), y = p.getY();
+        
+        if(x == 0 && y == 0) {
+            if(g[x + 1, y] != 6 || g[x + 1, y] != 7) {
+                return new Point(x + 1, y);
+            } else if(g[x, y + 1] != 6 || g[x, y + 1] != 7) {
+                return new Point(x, y + 1);
+            }
+        }
+        else if(x == 0) {
+            if(g[x + 1, y] != 6 || g[x + 1, y] != 7) { 
+                return new Point(x + 1, y);
+            } else if(g[x, y + 1] != 6 || g[x, y + 1] != 7) {
+                return new Point(x, y + 1);
+            } else if(g[x, y - 1] != 6 || g[x, y - 1] != 7) {
+                return new Point(x, y - 1);
+            }
+        }
+        else if(y == 0) {
+            if(g[x + 1, y] != 6 || g[x + 1, y] != 7) {
+                return new Point(x + 1, y);
+            } else if(g[x - 1, y] != 6 || g[x - 1, y] != 7) {
+                return new Point(x - 1, y);
+            } else if(g[x, y + 1] != 6 || g[x, y + 1] != 7) {
+                return new Point(x, y + 1);
+            }
+        }
+
+        if(x == 9 && y == 9) {
+            if(g[x - 1, y] != 6 || g[x - 1, y] != 7) {
+                return new Point(x - 1, y);
+            } else if(g[x, y - 1] != 6 || g[x, y - 1] != 7) {
+                return new Point(x, y - 1);
+            }
+        }
+        else if(x == 9) {
+            if(g[x - 1, y] != 6 || g[x - 1, y] != 7) {
+                return new Point(x - 1, y);
+            } else if(g[x, y + 1] != 6 || g[x, y + 1] != 7) {
+                return new Point(x, y + 1);
+            } else if(g[x, y - 1] != 6 || g[x, y - 1] != 7) {
+                return new Point(x, y - 1);
+            }
+        }
+        else if(y == 9) {
+            if(g[x + 1, y] != 6 || g[x + 1, y] != 7) {
+                return new Point(x + 1, y);
+            } else if(g[x - 1, y] != 6 || g[x - 1, y] != 7) {
+                return new Point(x - 1, y);
+            } else if(g[x, y - 1] != 6 || g[x, y - 1] != 7) {
+                return new Point(x, y - 1);
+            }
+        }
+
+        if(g[x + 1, y] != 6 || g[x + 1, y] != 7) {
+            return new Point(x + 1, y);
+        } else if(g[x - 1, y] != 6 || g[x - 1, y] != 7) {
+            return new Point(x - 1, y);
+        } else if(g[x, y + 1] != 6 || g[x, y + 1] != 7) {
+            return new Point(x, y + 1);
+        }else if(g[x, y - 1] != 6 || g[x, y - 1] != 7)
+            return new Point(x, y - 1);
+        return p;
+    }
+
+    private bool isCaseShotAllAround(Player opp, Point p) {
+        Grid g = opp.getDefense();
+        int x = p.getX(), y = p.getY();
+
+        if(x == 0 && y == 0) {
+            if((g.getGrid()[x + 1, y] != 6 || g.getGrid()[x + 1, y] != 7) && 
+                (g.getGrid()[x, y + 1] != 6 || g.getGrid()[x, y + 1] != 7))
+                return false;
+        }
+        else if(x == 0) {
+            if((g.getGrid()[x + 1, y] != 6 || g.getGrid()[x + 1, y] != 7) && 
+                (g.getGrid()[x, y + 1] != 6 || g.getGrid()[x, y + 1] != 7) &&
+                (g.getGrid()[x, y - 1] != 6 || g.getGrid()[x, y - 1] != 7))
+                return false;
+        }
+        else if(y == 0) {
+            if((g.getGrid()[x + 1, y] != 6 || g.getGrid()[x + 1, y] != 7) && 
+                (g.getGrid()[x - 1, y] != 6 || g.getGrid()[x - 1, y] != 7) &&
+                (g.getGrid()[x, y + 1] != 6 || g.getGrid()[x, y + 1] != 7))
+                return false;
+        }
+
+        if(x == 9 && y == 9) {
+            if((g.getGrid()[x - 1, y] != 6 || g.getGrid()[x - 1, y] != 7) &&
+                (g.getGrid()[x, y - 1] != 6 || g.getGrid()[x, y - 1] != 7))
+                return false;
+        }
+        else if(x == 9) {
+            if((g.getGrid()[x - 1, y] != 6 || g.getGrid()[x - 1, y] != 7) &&
+                (g.getGrid()[x, y + 1] != 6 || g.getGrid()[x, y + 1] != 7) &&
+                (g.getGrid()[x, y - 1] != 6 || g.getGrid()[x, y - 1] != 7))
+                return false;
+        }
+        else if(y == 9) {
+            if((g.getGrid()[x + 1, y] != 6 || g.getGrid()[x + 1, y] != 7) && 
+                (g.getGrid()[x - 1, y] != 6 || g.getGrid()[x - 1, y] != 7) &&
+                (g.getGrid()[x, y - 1] != 6 || g.getGrid()[x, y - 1] != 7))
+                return false;
+        }
+
+        if((g.getGrid()[x + 1, y] != 6 || g.getGrid()[x + 1, y] != 7) && 
+            (g.getGrid()[x - 1, y] != 6 || g.getGrid()[x - 1, y] != 7) &&
+            (g.getGrid()[x, y + 1] != 6 || g.getGrid()[x, y + 1] != 7) &&
+            (g.getGrid()[x, y - 1] != 6 || g.getGrid()[x, y - 1] != 7))
+            return false;
+
+        return true;
     }
 
     public override string ToString() {
