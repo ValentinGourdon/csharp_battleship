@@ -115,20 +115,16 @@ public class BotPlayer : Player{
                 this.successShoots.RemoveAt(0);
                 return chooseShootSimple(opp);
             } else {
-                Point np = getNextShoot(opp);
-                if(opp.getDefense().getGrid()[np.getX(), np.getY()] == 1 ||
-                    opp.getDefense().getGrid()[np.getX(), np.getY()] == 2 ||
-                    opp.getDefense().getGrid()[np.getX(), np.getY()] == 3 ||
-                    opp.getDefense().getGrid()[np.getX(), np.getY()] == 4 ||
-                    opp.getDefense().getGrid()[np.getX(), np.getY()] == 5)
-                    this.successShoots.Add(np);
-                return np;
+                return getNextShoot(opp);
             }
         }
     }
 
     private Point getNextShoot(Player opp) {
+        Console.WriteLine("getNextShoot()");
+        displaySuccess();
         Point p = this.successShoots[0];
+        Console.WriteLine("p : " + p.ToString());
         int[,] g = opp.getDefense().getGrid();
         int x = p.getX(), y = p.getY();
         
@@ -254,5 +250,10 @@ public class BotPlayer : Player{
 
     public int getLevel() {
         return this.level;
+    }
+
+    private void displaySuccess() {
+        foreach(Point p in this.successShoots)
+            Console.WriteLine(p.ToString());
     }
 }
