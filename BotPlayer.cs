@@ -41,24 +41,28 @@ public class BotPlayer : Player{
 
         switch(level) {
             case 1 :
-                p = chooseShootSimple(opp);
+                p = chooseShootSimple();
                 break;
             case 2 :
-                p = chooseShootMedium(opp);
+                p = chooseShootMedium();
                 break;
         }
         int x = p.getX(), y = p.getY();
 
-        Console.WriteLine("Player " + this.name + " shoot at " + opp.getName());
-        Console.WriteLine("Targeting " + new Grid().XYToString(x, y) + "...");
+        string display = "Player " + this.name + " shoot at " + opp.getName();
+        display += "\nTargeting " + new Grid().XYToString(x, y) + "...";
+
+        Console.WriteLine(display);
         if(displayMode)
             System.Threading.Thread.Sleep(500);
         else
             System.Threading.Thread.Sleep(1000);
         if(opp.getDefense().getGrid()[x, y] == 0) {
             opp.getDefense().setGrid(x, y, 6);
-            Console.WriteLine("Missed...");
             this.attack.setGrid(x, y, 6);
+            Console.WriteLine("Missed...");
+            display += "\nMissed...";
+            refreshDisplay(display);
         } else {
             Boat b = null;
             switch(opp.getDefense().getGrid()[x, y]) {
@@ -77,12 +81,17 @@ public class BotPlayer : Player{
                 case 5 :
                     b = opp.getBoatsDef().Find(x => x.getName().Contains("Destroyer"));
                     break;
+                default:
+                    Console.WriteLine("Target Error.");
+                    return;
             }
             this.successShoots.Add(new Point(x, y));    // For Medium level
             b.setTouched();
             opp.getDefense().setGrid(x, y, 7);
-            Console.WriteLine("Hit !");
             this.attack.setGrid(x, y, 7);
+            Console.WriteLine("Hit !");
+            display += "\nHit !";
+            refreshDisplay(display);
             // Sunk ?
             if(b.getTouched() == b.getLenght()) {
                 Console.WriteLine("Sunk !!! " + this.getName() 
@@ -93,151 +102,141 @@ public class BotPlayer : Player{
         }
     }
 
-    private Point chooseShootSimple(Player opp) {
+    private Point chooseShootSimple() {
         bool shootOk = false;
         int x = 99, y = 99;
         while(!shootOk) {
             x = new Random().Next(0, 10);
             y = new Random().Next(0, 10);
             // To be sure to shoot a non shot case
-            if(opp.getDefense().getGrid()[x, y] != 6 &&
-                opp.getDefense().getGrid()[x, y] != 7)
+            if(this.getAttack().getGrid()[x, y] != 6 &&
+                this.getAttack().getGrid()[x, y] != 7)
                 shootOk = true;
         }
         return new Point(x, y);
     }
 
-    private Point chooseShootMedium(Player opp) {
+    private Point chooseShootMedium() {
         if(this.successShoots.Count == 0) {
-            return chooseShootSimple(opp);
-        } else {
-            if(isCaseShotAllAround(opp, this.successShoots[0])) {
+            return chooseShootSimple();
+        } else if(this.successShoots.Count > 1) {
+            if(isCaseShotAllAround(this.successShoots[0]))
                 this.successShoots.RemoveAt(0);
-                return chooseShootSimple(opp);
+            return getNextShoot();
+        } else {
+            if(isCaseShotAllAround(this.successShoots[0])) {
+                this.successShoots.RemoveAt(0);
+                return chooseShootSimple();
             } else {
-                return getNextShoot(opp);
+                return getNextShoot();
             }
         }
     }
 
-    private Point getNextShoot(Player opp) {
-        Console.WriteLine("getNextShoot()");
-        displaySuccess();
+    private Point getNextShoot() {
         Point p = this.successShoots[0];
-        Console.WriteLine("p : " + p.ToString());
-        int[,] g = opp.getDefense().getGrid();
+        
+        int[,] g = this.getAttack().getGrid();
         int x = p.getX(), y = p.getY();
         
         if(x == 0 && y == 0) {
-            if(g[x + 1, y] != 6 || g[x + 1, y] != 7) {
+            if(g[x + 1, y] == 0) {
                 return new Point(x + 1, y);
-            } else if(g[x, y + 1] != 6 || g[x, y + 1] != 7) {
+            } else if(g[x, y + 1] == 0) {
                 return new Point(x, y + 1);
             }
-        }
-        else if(x == 0) {
-            if(g[x + 1, y] != 6 || g[x + 1, y] != 7) { 
+        } else if(x == 0) {
+            if(g[x + 1, y] == 0) { 
                 return new Point(x + 1, y);
-            } else if(g[x, y + 1] != 6 || g[x, y + 1] != 7) {
+            } else if(g[x, y + 1] == 0) {
                 return new Point(x, y + 1);
-            } else if(g[x, y - 1] != 6 || g[x, y - 1] != 7) {
+            } else if(g[x, y - 1] == 0) {
                 return new Point(x, y - 1);
             }
-        }
-        else if(y == 0) {
-            if(g[x + 1, y] != 6 || g[x + 1, y] != 7) {
+        } else if(y == 0) {
+            if(g[x + 1, y] == 0) {
                 return new Point(x + 1, y);
-            } else if(g[x - 1, y] != 6 || g[x - 1, y] != 7) {
+            } else if(g[x - 1, y] == 0) {
                 return new Point(x - 1, y);
-            } else if(g[x, y + 1] != 6 || g[x, y + 1] != 7) {
+            } else if(g[x, y + 1] == 0) {
                 return new Point(x, y + 1);
             }
         }
 
         if(x == 9 && y == 9) {
-            if(g[x - 1, y] != 6 || g[x - 1, y] != 7) {
+            if(g[x - 1, y] == 0) {
                 return new Point(x - 1, y);
-            } else if(g[x, y - 1] != 6 || g[x, y - 1] != 7) {
+            } else if(g[x, y - 1] == 0) {
                 return new Point(x, y - 1);
             }
-        }
-        else if(x == 9) {
-            if(g[x - 1, y] != 6 || g[x - 1, y] != 7) {
+        } else if(x == 9) {
+            if(g[x - 1, y] == 0) {
                 return new Point(x - 1, y);
-            } else if(g[x, y + 1] != 6 || g[x, y + 1] != 7) {
+            } else if(g[x, y + 1] == 0) {
                 return new Point(x, y + 1);
-            } else if(g[x, y - 1] != 6 || g[x, y - 1] != 7) {
+            } else if(g[x, y - 1] == 0) {
                 return new Point(x, y - 1);
             }
-        }
-        else if(y == 9) {
-            if(g[x + 1, y] != 6 || g[x + 1, y] != 7) {
+        } else if(y == 9) {
+            if(g[x + 1, y] == 0) {
                 return new Point(x + 1, y);
-            } else if(g[x - 1, y] != 6 || g[x - 1, y] != 7) {
+            } else if(g[x - 1, y] == 0) {
                 return new Point(x - 1, y);
-            } else if(g[x, y - 1] != 6 || g[x, y - 1] != 7) {
+            } else if(g[x, y - 1] == 0) {
                 return new Point(x, y - 1);
             }
         }
 
-        if(g[x + 1, y] != 6 || g[x + 1, y] != 7) {
-            return new Point(x + 1, y);
-        } else if(g[x - 1, y] != 6 || g[x - 1, y] != 7) {
-            return new Point(x - 1, y);
-        } else if(g[x, y + 1] != 6 || g[x, y + 1] != 7) {
-            return new Point(x, y + 1);
-        }else if(g[x, y - 1] != 6 || g[x, y - 1] != 7)
-            return new Point(x, y - 1);
+        if(g[(x + 1), y] == 0) {
+            return new Point((x + 1), y);
+        } else if(g[(x - 1), y] == 0) {
+            return new Point((x - 1), y);
+        } else if(g[x, (y + 1)] == 0) {
+            return new Point(x, (y + 1));
+        } else if(g[x, (y - 1)] == 0)
+            return new Point(x, (y - 1));
         return p;
     }
 
-    private bool isCaseShotAllAround(Player opp, Point p) {
-        Grid g = opp.getDefense();
+    private bool isCaseShotAllAround(Point p) {
+        int[,] g = this.getAttack().getGrid();
         int x = p.getX(), y = p.getY();
 
         if(x == 0 && y == 0) {
-            if((g.getGrid()[x + 1, y] != 6 || g.getGrid()[x + 1, y] != 7) && 
-                (g.getGrid()[x, y + 1] != 6 || g.getGrid()[x, y + 1] != 7))
-                return false;
-        }
-        else if(x == 0) {
-            if((g.getGrid()[x + 1, y] != 6 || g.getGrid()[x + 1, y] != 7) && 
-                (g.getGrid()[x, y + 1] != 6 || g.getGrid()[x, y + 1] != 7) &&
-                (g.getGrid()[x, y - 1] != 6 || g.getGrid()[x, y - 1] != 7))
-                return false;
-        }
-        else if(y == 0) {
-            if((g.getGrid()[x + 1, y] != 6 || g.getGrid()[x + 1, y] != 7) && 
-                (g.getGrid()[x - 1, y] != 6 || g.getGrid()[x - 1, y] != 7) &&
-                (g.getGrid()[x, y + 1] != 6 || g.getGrid()[x, y + 1] != 7))
-                return false;
-        }
+            if((g[x + 1, y] != 0) && 
+                (g[x, y + 1] != 0))
+                return true;
+        } else if(x == 0) {
+            if((g[x + 1, y] != 0) && 
+                (g[x, y + 1] != 0) &&
+                (g[x, y - 1] != 0))
+                return true;
+        } else if(y == 0) {
+            if((g[x + 1, y] != 0) && 
+                (g[x - 1, y] != 0) &&
+                (g[x, y + 1] != 0))
+                return true;
+        } else if(x == 9 && y == 9) {
+            if((g[x - 1, y] != 0) &&
+                (g[x, y - 1] != 0))
+                return true;
+        } else if(x == 9) {
+            if((g[x - 1, y] != 0) &&
+                (g[x, y + 1] != 0) &&
+                (g[x, y - 1] != 0))
+                return true;
+        } else if(y == 9) {
+            if((g[x + 1, y] != 0) && 
+                (g[x - 1, y] != 0) &&
+                (g[x, y - 1] != 0))
+                return true;
+        } else if((g[x + 1, y] != 0) && 
+                (g[x - 1, y] != 0) &&
+                (g[x, y + 1] != 0) &&
+                (g[x, y - 1] != 0))
+            return true;
 
-        if(x == 9 && y == 9) {
-            if((g.getGrid()[x - 1, y] != 6 || g.getGrid()[x - 1, y] != 7) &&
-                (g.getGrid()[x, y - 1] != 6 || g.getGrid()[x, y - 1] != 7))
-                return false;
-        }
-        else if(x == 9) {
-            if((g.getGrid()[x - 1, y] != 6 || g.getGrid()[x - 1, y] != 7) &&
-                (g.getGrid()[x, y + 1] != 6 || g.getGrid()[x, y + 1] != 7) &&
-                (g.getGrid()[x, y - 1] != 6 || g.getGrid()[x, y - 1] != 7))
-                return false;
-        }
-        else if(y == 9) {
-            if((g.getGrid()[x + 1, y] != 6 || g.getGrid()[x + 1, y] != 7) && 
-                (g.getGrid()[x - 1, y] != 6 || g.getGrid()[x - 1, y] != 7) &&
-                (g.getGrid()[x, y - 1] != 6 || g.getGrid()[x, y - 1] != 7))
-                return false;
-        }
-
-        if((g.getGrid()[x + 1, y] != 6 || g.getGrid()[x + 1, y] != 7) && 
-            (g.getGrid()[x - 1, y] != 6 || g.getGrid()[x - 1, y] != 7) &&
-            (g.getGrid()[x, y + 1] != 6 || g.getGrid()[x, y + 1] != 7) &&
-            (g.getGrid()[x, y - 1] != 6 || g.getGrid()[x, y - 1] != 7))
-            return false;
-
-        return true;
+        return false;
     }
 
     public override string ToString() {
@@ -255,5 +254,11 @@ public class BotPlayer : Player{
     private void displaySuccess() {
         foreach(Point p in this.successShoots)
             Console.WriteLine(p.ToString());
+    }
+
+    private void refreshDisplay(string display) {
+        Console.Clear();
+        this.displayBothGrid();
+        Console.WriteLine(display);
     }
 }

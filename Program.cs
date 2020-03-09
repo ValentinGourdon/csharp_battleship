@@ -8,6 +8,7 @@ namespace battleship
     {
         static void Main(string[] args)
         {
+            //test();
             bool continueGame = true;
             while(continueGame) {
                 Console.Clear();
@@ -403,6 +404,78 @@ namespace battleship
             "Jennifer" };
             
             return names[new Random().Next(names.Count)];
+        }
+
+        public static void test() {
+            List<Boat> boatsPosP1 = new List<Boat>();
+                List<Boat> boatsDefP1 = new List<Boat>();
+
+                Carrier carrierPosP1 = new Carrier();
+                boatsPosP1.Add(carrierPosP1);
+                Battleship battleshipPosP1 = new Battleship();
+                boatsPosP1.Add(battleshipPosP1);
+                Cruiser cruiserPosP1 = new Cruiser();
+                boatsPosP1.Add(cruiserPosP1);
+                Submarine submarinePosP1 = new Submarine();
+                boatsPosP1.Add(submarinePosP1);
+                Destroyer destroyerPosP1 = new Destroyer();
+                boatsPosP1.Add(destroyerPosP1);
+
+                Carrier carrierDefP1 = new Carrier();
+                boatsDefP1.Add(carrierDefP1);
+                Battleship battleshipDefP1 = new Battleship();
+                boatsDefP1.Add(battleshipDefP1);
+                Cruiser cruiserDefP1 = new Cruiser();
+                boatsDefP1.Add(cruiserDefP1);
+                Submarine submarineDefP1 = new Submarine();
+                boatsDefP1.Add(submarineDefP1);
+                Destroyer destroyerDefP1 = new Destroyer();
+                boatsDefP1.Add(destroyerDefP1);
+
+                Grid gridA_P1 = new Grid("Attack");
+                Grid gridD_P1 = new Grid("Defense");
+
+
+                // Build PLAYER 2 fleet
+                List<Boat> boatsPosP2 = new List<Boat>();
+                List<Boat> boatsDefP2 = new List<Boat>();
+
+                Carrier carrierPosP2 = new Carrier();
+                boatsPosP2.Add(carrierPosP2);
+                Battleship battleshipPosP2 = new Battleship();
+                boatsPosP2.Add(battleshipPosP2);
+                Cruiser cruiserPosP2 = new Cruiser();
+                boatsPosP2.Add(cruiserPosP2);
+                Submarine submarinePosP2 = new Submarine();
+                boatsPosP2.Add(submarinePosP2);
+                Destroyer destroyerPosP2 = new Destroyer();
+                boatsPosP2.Add(destroyerPosP2);
+
+                Carrier carrierDefP2 = new Carrier();
+                boatsDefP2.Add(carrierDefP2);
+                Battleship battleshipDefP2 = new Battleship();
+                boatsDefP2.Add(battleshipDefP2);
+                Cruiser cruiserDefP2 = new Cruiser();
+                boatsDefP2.Add(cruiserDefP2);
+                Submarine submarineDefP2 = new Submarine();
+                boatsDefP2.Add(submarineDefP2);
+                Destroyer destroyerDefP2 = new Destroyer();
+                boatsDefP2.Add(destroyerDefP2);
+
+                Grid gridA_P2 = new Grid("Attack");
+                Grid gridD_P2 = new Grid("Defense");
+
+                BotPlayer bp1 = new BotPlayer("name1", gridA_P1, gridD_P1, boatsPosP1, boatsDefP1, 2);
+                BotPlayer bp2 = new BotPlayer("name2", gridA_P2, gridD_P2, boatsPosP2, boatsDefP2, 2);
+
+                bp1.autoPlaceAllBoats();
+                bp2.autoPlaceAllBoats();
+
+                while(true) {
+                    bp1.autoShoot(bp2, true, 2);
+                    bp2.autoShoot(bp1, true, 2);
+                }
+
         }
     }
 
