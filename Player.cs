@@ -103,16 +103,20 @@ public class Player {
     }
 
     public bool shoot(Player opp, string shootInput) {
+        string input = this.getName() + ", it's your turn to shoot. Please enter coordinates : (A1 to J10)";
         int[] pos = new Grid().translateCoordinates(shootInput);
         int x = pos[0], y = pos[1];
         if(pos[0] == 99 || pos[1] == 99)
             return false;
         Console.WriteLine("Targeting " + shootInput +"...");
+        input += "\n" + shootInput + "\nTargeting " + shootInput +"...";
         System.Threading.Thread.Sleep(1000);
         if(opp.getDefense().getGrid()[x, y] == 0) {
             opp.getDefense().setGrid(x, y, 6);
-            Console.WriteLine("Missed...");
             this.attack.setGrid(x, y, 6);
+            Console.WriteLine("Missed...");
+            input += "\nMissed...";
+            refreshDisplay(input);
         } else if(opp.getDefense().getGrid()[x, y] >= 1 && opp.getDefense().getGrid()[x, y] <= 5){
             Boat b = null;
             switch(opp.getDefense().getGrid()[x, y]) {
@@ -134,8 +138,10 @@ public class Player {
             }
             b.setTouched();
             opp.getDefense().setGrid(x, y, 7);
-            Console.WriteLine("Hit !");
             this.attack.setGrid(x, y, 7);
+            Console.WriteLine("Hit !");
+            input+= "\nHit !";
+            refreshDisplay(input);
             // Sunk ?
             if(b.getTouched() == b.getLenght()) {
                 Console.WriteLine("Sunk !!! Congratulation you've sunk " 
@@ -279,5 +285,11 @@ public class Player {
         Console.ForegroundColor = ConsoleColor.DarkRed;
         Console.Write(space + "    - - - - - - - - - - \n");
         Console.ResetColor();
+    }
+
+    private void refreshDisplay(string display) {
+        Console.Clear();
+        this.displayBothGrid();
+        Console.WriteLine(display);
     }
 }

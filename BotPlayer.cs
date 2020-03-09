@@ -62,7 +62,8 @@ public class BotPlayer : Player{
             this.attack.setGrid(x, y, 6);
             Console.WriteLine("Missed...");
             display += "\nMissed...";
-            refreshDisplay(display);
+            if(displayMode)
+                refreshDisplay(display);
         } else {
             Boat b = null;
             switch(opp.getDefense().getGrid()[x, y]) {
@@ -91,7 +92,8 @@ public class BotPlayer : Player{
             this.attack.setGrid(x, y, 7);
             Console.WriteLine("Hit !");
             display += "\nHit !";
-            refreshDisplay(display);
+            if(displayMode)
+                refreshDisplay(display);
             // Sunk ?
             if(b.getTouched() == b.getLenght()) {
                 Console.WriteLine("Sunk !!! " + this.getName() 
